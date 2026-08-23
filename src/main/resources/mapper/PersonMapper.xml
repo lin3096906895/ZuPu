@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zupu.zupu.mapper.PersonMapper">
+    <sql id="personColumns">
+        p.id, p.family_id, p.name, p.gender, p.birth_date, p.death_date, p.birth_place, p.biography, p.photo,
+        p.father_id, p.mother_id, p.adoptive_father_id, p.adoptive_mother_id, p.generation_no, p.order_num,
+        p.status, p.create_time, p.update_time,
+        f.name AS family_name, father.name AS father_name, mother.name AS mother_name
+    </sql>
+
+    <select id="selectById" resultType="com.zupu.zupu.entity.Person">
+        SELECT <include refid="personColumns"/>
+        FROM person p
+        INNER JOIN family f ON f.id = p.family_id
+        LEFT JOIN person father ON father.id = p.father_id
+        LEFT JOIN person mother ON mother.id = p.mother_id
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="selectByFamilyId" resultType="com.zupu.zupu.entity.Person">
+        SELECT <include refid="personColumns"/>
+        FROM person p
+        INNER JOIN family f ON f.id = p.family_id
+        LEFT JOIN person father ON father.id = p.father_id
+        LEFT JOIN person mother ON mother.id = p.mother_id
+        WHERE p.family_id = #{familyId}
+        ORDER BY p.generation_no ASC, p.order_num ASC, p.id ASC
+    </select>
+
+    <select id="selectByFilters" resultType="com.zupu.zupu.entity.Person">
+        SELECT <include refid="personColumns"/>
+        FROM person p
+        INNER JOIN family f ON f.id = p.family_id
+        LEFT JOIN person father ON father.id = p.father_id
+        LEFT JOIN person mother ON mother.id = p.mother_id
+        <where>
+            <if test="familyId != null">
+                AND p.family_id = #{familyId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (p.name LIKE CONCAT('%', #{keyword}, '%')
+                OR IFNULL(father.name, '') LIKE CONCAT('%', #{keyword}, '%')
+                OR IFNULL(mother.name, '') LIKE CONCAT('%', #{keyword}, '%')
+                OR IFNULL(p.birth_place, '') LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY p.generation_no ASC, p.order_num ASC, p.id ASC
+    </select>
+
+    <insert id="insert" parameterType="com.zupu.zupu.entity.Person" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO person (family_id, name, gender, birth_date, death_date, birth_place, biography, photo,
+                            father_id, mother_id, adoptive_father_id, adoptive_mother_id, generation_no, order_num, status)
+        VALUES (#{familyId}, #{name}, #{gender}, #{birthDate}, #{deathDate}, #{birthPlace}, #{biography}, #{photo},
+                #{fatherId}, #{motherId}, #{adoptiveFatherId}, #{adoptiveMotherId}, #{generationNo}, #{orderNum}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.zupu.zupu.entity.Person">
+        UPDATE person
+        SET family_id = #{familyId},
+            name = #{name},
+            gender = #{gender},
+            birth_date = #{birthDate},
+            death_date = #{deathDate},
+            birth_place = #{birthPlace},
+            biography = #{biography},
+            photo = #{photo},
+            father_id = #{fatherId},
+            mother_id = #{motherId},
+            adoptive_father_id = #{adoptiveFatherId},
+            adoptive_mother_id = #{adoptiveMotherId},
+            generation_no = #{generationNo},
+            order_num = #{orderNum},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM person WHERE id = #{id}
+    </delete>
+
+    <select id="countByFamilyId" resultType="int">
+        SELECT COUNT(*) FROM person WHERE family_id = #{familyId}
+    </select>
+
+    <select id="countAccessible" resultType="int">
+        SELECT COUNT(*)
+        FROM person p
+        INNER JOIN family f ON f.id = p.family_id
+        <where>
+            <if test="!admin">
+                f.owner_user_id = #{ownerUserId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectParentOptions" resultType="com.zupu.zupu.model.LookupOption">
+        SELECT id, name AS label, family_id
+        FROM person
+        WHERE family_id = #{familyId}
+        <if test="excludeId != null">
+            AND id != #{excludeId}
+        </if>
+        ORDER BY generation_no ASC, order_num ASC
+    </select>
+
+    <select id="selectSpouseNames" resultType="java.lang.String">
+        SELECT p.name
+        FROM marriage m
+        INNER JOIN person p ON p.id = CASE WHEN m.husband_id = #{id} THEN m.wife_id ELSE m.husband_id END
+        WHERE m.husband_id = #{id} OR m.wife_id = #{id}
+    </select>
+
+    <select id="selectChildren" resultType="com.zupu.zupu.entity.Person">
+        SELECT <include refid="personColumns"/>
+        FROM person p
+        INNER JOIN family f ON f.id = p.family_id
+        LEFT JOIN person father ON father.id = p.father_id
+        LEFT JOIN person mother ON mother.id = p.mother_id
+        WHERE p.father_id = #{parentId} OR p.mother_id = #{parentId}
+        ORDER BY p.order_num ASC, p.id ASC
+    </select>
+
+    <select id="selectRoots" resultType="com.zupu.zupu.entity.Person">
+        SELECT <include refid="personColumns"/>
+        FROM person p
+        INNER JOIN family f ON f.id = p.family_id
+        LEFT JOIN person father ON father.id = p.father_id
+        LEFT JOIN person mother ON mother.id = p.mother_id
+        WHERE p.family_id = #{familyId}
+          AND p.father_id IS NULL
+          AND p.mother_id IS NULL
+        ORDER BY p.generation_no ASC, p.order_num ASC, p.id ASC
+    </select>
+</mapper>

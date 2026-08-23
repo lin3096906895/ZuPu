@@ -1,0 +1,8 @@
+# 复制本文件为 application-local.yml 并填入真实值（application-local.yml 已被 .gitignore 忽略）
+# 启动：mvnw spring-boot:run -Dspring-boot.run.profiles=local
+spring:
+  datasource:
+    password: 你的MySQL密码
+
+deepseek:
+  api-key: 你的DeepSeek API Key

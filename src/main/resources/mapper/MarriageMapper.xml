@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zupu.zupu.mapper.MarriageMapper">
+    <sql id="marriageColumns">
+        m.id, m.family_id, m.husband_id, m.wife_id, m.marriage_order, m.marry_date, m.divorce_date,
+        m.status, m.is_primary, m.note, m.create_time, m.update_time,
+        h.name AS husband_name, w.name AS wife_name
+    </sql>
+
+    <select id="selectByFamilyId" resultType="com.zupu.zupu.entity.Marriage">
+        SELECT <include refid="marriageColumns"/>
+        FROM marriage m
+        INNER JOIN person h ON h.id = m.husband_id
+        INNER JOIN person w ON w.id = m.wife_id
+        WHERE m.family_id = #{familyId}
+        ORDER BY m.marriage_order ASC, m.id ASC
+    </select>
+
+    <select id="selectByPersonId" resultType="com.zupu.zupu.entity.Marriage">
+        SELECT <include refid="marriageColumns"/>
+        FROM marriage m
+        INNER JOIN person h ON h.id = m.husband_id
+        INNER JOIN person w ON w.id = m.wife_id
+        WHERE m.husband_id = #{personId} OR m.wife_id = #{personId}
+        ORDER BY m.marriage_order ASC, m.id ASC
+    </select>
+
+    <select id="selectById" resultType="com.zupu.zupu.entity.Marriage">
+        SELECT <include refid="marriageColumns"/>
+        FROM marriage m
+        INNER JOIN person h ON h.id = m.husband_id
+        INNER JOIN person w ON w.id = m.wife_id
+        WHERE m.id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zupu.zupu.entity.Marriage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO marriage (family_id, husband_id, wife_id, marriage_order, marry_date, divorce_date, status, is_primary, note)
+        VALUES (#{familyId}, #{husbandId}, #{wifeId}, #{marriageOrder}, #{marryDate}, #{divorceDate}, #{status}, #{isPrimary}, #{note})
+    </insert>
+
+    <update id="update" parameterType="com.zupu.zupu.entity.Marriage">
+        UPDATE marriage
+        SET family_id = #{familyId},
+            husband_id = #{husbandId},
+            wife_id = #{wifeId},
+            marriage_order = #{marriageOrder},
+            marry_date = #{marryDate},
+            divorce_date = #{divorceDate},
+            status = #{status},
+            is_primary = #{isPrimary},
+            note = #{note}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM marriage WHERE id = #{id}
+    </delete>
+</mapper>

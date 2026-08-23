@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zupu.zupu.mapper.GenerationMapper">
+    <select id="selectByFamilyId" resultType="com.zupu.zupu.entity.Generation">
+        SELECT id, family_id, title, sort_order, description, create_time, update_time
+        FROM generation
+        WHERE family_id = #{familyId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="selectById" resultType="com.zupu.zupu.entity.Generation">
+        SELECT id, family_id, title, sort_order, description, create_time, update_time
+        FROM generation
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zupu.zupu.entity.Generation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO generation (family_id, title, sort_order, description)
+        VALUES (#{familyId}, #{title}, #{sortOrder}, #{description})
+    </insert>
+
+    <update id="update" parameterType="com.zupu.zupu.entity.Generation">
+        UPDATE generation
+        SET family_id = #{familyId},
+            title = #{title},
+            sort_order = #{sortOrder},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM generation WHERE id = #{id}
+    </delete>
+
+    <select id="countByFamilyId" resultType="int">
+        SELECT COUNT(*) FROM generation WHERE family_id = #{familyId}
+    </select>
+
+    <select id="selectOptionsByFamilyId" resultType="com.zupu.zupu.model.LookupOption">
+        SELECT id, title AS label, family_id
+        FROM generation
+        WHERE family_id = #{familyId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+</mapper>

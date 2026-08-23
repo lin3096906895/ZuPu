@@ -1,0 +1,11 @@
+target/
+frontend/
+uploads/
+*.log
+.git/
+.gitignore
+.env
+src/main/resources/application-local.yml
+src/main/resources/application-local.yml.example
+ai-test.json
+test_upload.txt

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zupu.zupu.mapper.FamilyEventMapper">
+    <select id="selectById" resultType="com.zupu.zupu.entity.FamilyEvent">
+        SELECT id, family_id, title, event_date, description, create_time, update_time
+        FROM family_event
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByFamilyId" resultType="com.zupu.zupu.entity.FamilyEvent">
+        SELECT id, family_id, title, event_date, description, create_time, update_time
+        FROM family_event
+        WHERE family_id = #{familyId}
+        ORDER BY event_date DESC
+    </select>
+
+    <insert id="insert" parameterType="com.zupu.zupu.entity.FamilyEvent" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO family_event (family_id, title, event_date, description)
+        VALUES (#{familyId}, #{title}, #{eventDate}, #{description})
+    </insert>
+
+    <update id="update" parameterType="com.zupu.zupu.entity.FamilyEvent">
+        UPDATE family_event
+        SET title = #{title},
+            event_date = #{eventDate},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM family_event
+        WHERE id = #{id}
+    </delete>
+</mapper>
