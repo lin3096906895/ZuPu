@@ -52,6 +52,17 @@ mybatis:
 app:
   upload:
     path: uploads/
+  cors:
+    # 允许跨域的前端来源，逗号分隔。生产环境请改为你的真实域名；
+    # 留空表示不允许任何跨域（前端经 nginx 同源代理时无需配置）
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  security:
+    # 是否启用内置演示账号（admin / demo，密码见 README）。
+    # 生产环境请设为 false：启动时会自动禁用仍在使用默认密码的演示账号
+    demo-accounts-enabled: ${DEMO_ACCOUNTS_ENABLED:true}
+  ai:
+    # 注入 system prompt 的家族成员上限，超出部分由 AI 通过工具按需查询
+    max-prompt-members: ${AI_MAX_PROMPT_MEMBERS:200}
 
 pagehelper:
   helper-dialect: mysql

@@ -120,6 +120,9 @@ cd frontend && cp .env.example .env && npm install && npm run dev
 | `REDIS_HOST` / `REDIS_PORT` | Redis 地址/端口 | `localhost` / `6379` |
 | `DEEPSEEK_API_KEY` | DeepSeek API Key（AI 助手用） | 必填 |
 | `JWT_SECRET` | JWT 签名密钥（生产务必更换，≥ 32 字节） | 内置占位值 |
+| `CORS_ALLOWED_ORIGINS` | 允许跨域的前端来源，逗号分隔 | `http://localhost:5173` 等 |
+| `DEMO_ACCOUNTS_ENABLED` | 是否启用内置演示账号，设为 `false` 会自动禁用未改密码的演示账号 | `true` |
+| `AI_MAX_PROMPT_MEMBERS` | 注入 AI system prompt 的成员上限 | `200` |
 
 ### 前端
 
@@ -133,6 +136,20 @@ cd frontend && cp .env.example .env && npm install && npm run dev
 
 - 管理员：`admin / admin123456`
 - 普通用户：`demo / admin123456`
+
+> ⚠️ **部署到公网前务必处理这两个账号。**
+> 它们的密码是公开写在文档里的，任何人克隆仓库后都能直接登录。项目启动时会检测这一情况：
+> 把 `DEMO_ACCOUNTS_ENABLED` 设为 `false`，仍在使用默认密码的演示账号会被自动禁用；
+> 或者直接登录后修改密码，检测到密码已变更即不再干预。
+
+## 部署到公网前的检查清单
+
+- [ ] `JWT_SECRET` 换成随机值（≥ 32 字节），不要使用默认占位值
+- [ ] `DEMO_ACCOUNTS_ENABLED=false`，或已修改 `admin` / `demo` 的密码
+- [ ] `CORS_ALLOWED_ORIGINS` 改为你的真实域名，不要保留 `*`
+- [ ] 数据库 root 密码、`DEEPSEEK_API_KEY` 通过环境变量注入，不要写进代码
+- [ ] 百度地图 AK 在控制台配置 Referer 白名单，避免被盗刷配额
+- [ ] 为 `/api/auth/register` 加上限流或邀请码，避免被批量注册
 
 ## 数据库说明
 

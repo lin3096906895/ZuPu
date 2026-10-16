@@ -6,6 +6,7 @@ import com.zupu.zupu.entity.Person;
 import com.zupu.zupu.mapper.FamilyMapper;
 import com.zupu.zupu.mapper.PersonMapper;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -20,13 +21,16 @@ public class AiService {
     private final GenealogyTools tools;
     private final PersonMapper personMapper;
     private final FamilyMapper familyMapper;
+    private final int maxPromptMembers;
 
     public AiService(ChatClient.Builder builder, GenealogyTools tools,
-                     PersonMapper personMapper, FamilyMapper familyMapper) {
+                     PersonMapper personMapper, FamilyMapper familyMapper,
+                     @Value("${app.ai.max-prompt-members:200}") int maxPromptMembers) {
         this.chatClient = builder.build();
         this.tools = tools;
         this.personMapper = personMapper;
         this.familyMapper = familyMapper;
+        this.maxPromptMembers = maxPromptMembers;
     }
 
     public Flux<String> chat(String question, Integer familyId) {
@@ -50,8 +54,17 @@ public class AiService {
                         .append("，家族ID=").append(familyId).append("）\n");
                 sb.append("查询两人亲缘关系时，请调用 getRelationship 工具，传入双方姓名和家族ID。\n");
                 List<Person> people = personMapper.selectByFamilyId(familyId);
-                sb.append("家族成员共 ").append(people.size()).append(" 人：\n");
-                for (Person p : people) {
+                List<Person> included = people.size() > maxPromptMembers
+                        ? people.subList(0, maxPromptMembers)
+                        : people;
+                sb.append("家族成员共 ").append(people.size()).append(" 人");
+                if (included.size() < people.size()) {
+                    // 成员过多时不全部注入，避免 prompt 超长导致成本与延迟失控
+                    sb.append("，以下仅列出前 ").append(included.size())
+                            .append(" 人；需要查询其他成员时请调用 searchPerson 等工具");
+                }
+                sb.append("：\n");
+                for (Person p : included) {
                     sb.append("- ").append(p.getName())
                             .append("（").append(p.getGender())
                             .append("，第").append(p.getGenerationNo()).append("世");
