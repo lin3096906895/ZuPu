@@ -1,3 +1,15 @@
+-- ============================================================
+-- 【遗留文件 / LEGACY】请勿用于新部署
+--
+-- 这是项目早期设计的建表脚本，与当前实现不一致：
+--   * 人物只支持单亲（parent_id），现为 father_id / mother_id
+--   * 配偶内联在 person.spouse_name，现为独立 marriage 表
+--   * 含已废弃的 person_tree 表
+--
+-- 当前表结构由 Flyway 管理，见 src/main/resources/db/migration/
+-- 仅作历史参考保留。
+-- ============================================================
+
 CREATE DATABASE IF NOT EXISTS zupu
   DEFAULT CHARACTER SET utf8mb4
   DEFAULT COLLATE utf8mb4_0900_ai_ci;

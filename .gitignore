@@ -39,6 +39,11 @@ build/
 application-local.yml
 *.local.yml
 .env
+.env.local
+.env.*.local
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
 *.log
 uploads/
 test_upload.txt

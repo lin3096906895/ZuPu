@@ -57,7 +57,7 @@ async function load() {
 
 function renderMap(persons) {
   if (!window.BMap) {
-    ElMessage.error('百度地图加载失败，请检查网络或 AK 是否有效')
+    ElMessage.error('百度地图加载失败：请检查网络，或确认 VITE_BAIDU_AK 已配置为有效的浏览器端 AK')
     return
   }
   if (!map) {

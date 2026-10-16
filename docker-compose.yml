@@ -42,7 +42,10 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_BAIDU_AK: ${BAIDU_MAP_AK}
     container_name: zupu-frontend
     ports:
       - "5173:80"

@@ -68,8 +68,10 @@ ZuPu
 │       ├── utils/      # 请求工具
 │       └── views/      # 页面（9 个视图）
 ├── sql/                # 额外 SQL 脚本
+├── docs/               # 文档（legacy/ 为早期设计的遗留脚本）
 ├── docker-compose.yml
 ├── Dockerfile
+├── LICENSE
 └── pom.xml
 ```
 
@@ -81,7 +83,10 @@ ZuPu
 # 1. 复制 .env.example 为 .env，填入 MySQL 密码与 DeepSeek API Key
 cp .env.example .env
 
-# 2. 一键启动全部服务（MySQL + Redis + 后端 + 前端）
+# 2. 复制 frontend/.env.example 为 frontend/.env，填入百度地图 AK
+cp frontend/.env.example frontend/.env
+
+# 3. 一键启动全部服务（MySQL + Redis + 后端 + 前端）
 docker compose up -d --build
 ```
 
@@ -98,12 +103,14 @@ docker compose up -d mysql redis
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 
 # 3. 启动前端
-cd frontend && npm install && npm run dev
+cd frontend && cp .env.example .env && npm install && npm run dev
 ```
 
 访问 http://localhost:5173（Vite 代理将 `/api` 转发到后端 8080）。
 
 ## 环境变量
+
+### 后端
 
 | 变量 | 说明 | 默认值 |
 |------|------|--------|
@@ -114,7 +121,13 @@ cd frontend && npm install && npm run dev
 | `DEEPSEEK_API_KEY` | DeepSeek API Key（AI 助手用） | 必填 |
 | `JWT_SECRET` | JWT 签名密钥（生产务必更换，≥ 32 字节） | 内置占位值 |
 
-> 本地开发时也可在 `application-local.yml` 中直接填入，该文件已被 `.gitignore` 忽略。
+### 前端
+
+| 变量 | 说明 |
+|------|------|
+| `VITE_BAIDU_AK` | 百度地图浏览器端 AK，构建期注入 `index.html`（本地填 `frontend/.env`，Docker 填根目录 `.env` 的 `BAIDU_MAP_AK`） |
+
+> 本地开发时也可在 `application-local.yml` 中直接填入后端密钥，该文件已被 `.gitignore` 忽略。
 
 ## 演示账号
 
@@ -133,3 +146,7 @@ cd frontend && npm install && npm run dev
 ```bash
 ./mvnw clean test
 ```
+
+## 许可
+
+本项目基于 [MIT License](LICENSE) 开源。

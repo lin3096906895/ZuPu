@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>族谱管理系统</title>
-    <script src="https://api.map.baidu.com/api?v=3.0&ak=NxUWVLMBaeFjxBhgK0z2NE1Z1TkZzx3l"></script>
+    <!-- 百度地图浏览器端 AK，通过 VITE_BAIDU_AK 注入（见 .env.example） -->
+    <script src="https://api.map.baidu.com/api?v=3.0&ak=%VITE_BAIDU_AK%"></script>
   </head>
   <body>
     <div id="app"></div>
